@@ -112,13 +112,15 @@ export class ProductsService {
     await queryRunner.startTransaction();
 
     try {
-      if ( images ) {
+      if ( images )  {
+        // se van a borrar las imagenes viejas
         await queryRunner.manager.delete( ProductImage, { product: { id }})
+        // se empiezan a mapear las imagenes nuevas para insertar 
         product.images = images.map(
           image => this.productImageRepository.create({ url: image })
         )
       } else {
-        
+        product.images = await this.productImageRepository.findBy({ product: { id } });
       }
     
       await queryRunner.manager.save( product );
@@ -127,6 +129,7 @@ export class ProductsService {
       return product;
       
     } catch (error) {
+      console.log(error);
       await queryRunner.rollbackTransaction();
       await queryRunner.release();
       this.handleDBExceptions(error);
@@ -138,6 +141,18 @@ export class ProductsService {
     const product = await this.findOne( id );
     await this.productRepository.remove( product );
     
+  }
+
+  async deleteAllProducts() {
+    const query = this.productRepository.createQueryBuilder('product');
+    try {
+      return await query
+        .delete()
+        .where({})
+        .execute();
+    } catch (error) {
+      this.handleDBExceptions(error);
+    }
   }
 
 
