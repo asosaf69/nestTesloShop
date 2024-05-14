@@ -22,6 +22,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
       autoLoadEntities: true,
       synchronize: true,
     }),
+    //para dar permisos a la carpeta public a ser publica
     ServeStaticModule.forRoot({
       rootPath: join(__dirname,'..','public'),
     }),
